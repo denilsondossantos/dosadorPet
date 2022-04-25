@@ -1,13 +1,11 @@
-#include "HX711.h"
-#define DT_PIN 16
-#define SCK_PIN 17
+
 HX711 scale;
 
 float kg = 0;
 float pesoLido = 0;
 float taraPeso = 0;
 
-void setup()
+void configBalanca()
 {
     scale.begin(DT_PIN, SCK_PIN);
     delay(1000);
@@ -16,7 +14,7 @@ void setup()
     taraPeso = calibra();
 }
 
-void loop()
+void rodaBalanca()
 {   
 peso();
 }
