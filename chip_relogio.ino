@@ -41,8 +41,10 @@ void configRelogio()
     rtc.setSquareWave(SquareWaveDisable);
 }
 
-void rodaRelogio()
-{
+String printaData()
+{   
+    String retornoData = ""; //variavel de teste 
+
     char name[DATE_STRING_SHORT + 1];
     uint8_t hour;
     uint8_t min;
@@ -93,10 +95,11 @@ void rodaRelogio()
 
 
     //minhavariavel de testes
-    if(hour == 11 && min  == 3 && sec == 0){
-      Serial.println("toca alarme");
-      }
+    //if(hour == 11 && min  == 3 && sec == 0){
+    //  Serial.println("toca alarme");
+    //  }
+    
+    retornoData = jsonData(year, mon, mday, hour, min, sec);
 
-    // Wait a second
-    delay(1000);
+return retornoData;
 }

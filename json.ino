@@ -31,15 +31,20 @@ String json (String nome, String raca, int idade, double peso, String tipoRacao,
   return texto;
 }
 
-/*
-nome
-raca
-idade
-peso
-tipoRacao
-pesoDispenser
-pesoPote
-agendas //verificar com wagner
-*/
 
- 
+String jsonData (int ano, int mes, int dia, int hora, int minuto, int segundo){
+  DynamicJsonDocument doc(1024);
+  String texto;
+
+  doc["ano"]           = ano;
+  doc["mes"]           = mes;
+  doc["dia"]           = dia;
+  doc["hora"]          = hora;
+  doc["minuto"]        = minuto;
+  doc["segundo"]       = segundo;
+
+
+  serializeJson(doc, texto);
+
+  return texto;
+}

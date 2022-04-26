@@ -107,3 +107,12 @@ void loop()
     // Wait a second
     delay(1000);
 }
+
+
+void configHora(int hora, int minuto){
+  // Write time to RTC
+    if (!rtc.setTime(hora, minuto, 0)) {
+    // Error: Set time failed
+    }
+  
+  }

@@ -27,6 +27,7 @@ const char *password = "dosadorpet";
 //String dados = "";
 char dados[256] = {0};
 String dadosPet = "";
+String infoData = "";
 //----------------------------------------------------------------
 AsyncWebServer server(80);
 
@@ -42,6 +43,9 @@ void setup()
     Serial.println("Um erro ocorreu durante a montagem da SPIFFS");
     return;
   }
+
+  //Seta configurações do chip relógio
+  configRelogio();
 
   //inicia  acess point
   WiFi.softAP(ssid, password);
@@ -62,6 +66,31 @@ void setup()
   request->send(SPIFFS, "/pet.jpg", "image/jpeg"); //devolve imagem do pet });
   });
 
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "text/plain", printaData()); //devolve imagem do pet });
+  });
+
+  server.on(
+    "/data", HTTP_POST,
+    [](AsyncWebServerRequest *request) {},
+    NULL,
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+      for (size_t i = 0; i < len; i++)
+      {
+        dados[i]= data[i];                         
+      }
+      for(int i = 0; i <= len ; i++){
+        infoData = infoData + dados[i];
+        }
+
+      Serial.print(infoData);
+      // depois que guardar na spiffs tem que zerar a variavel
+      dadosPet = "";
+      dados = {0};
+      Serial.println();
+      request->send(200);
+  });
+
   server.on(
     "/post", HTTP_POST,
     [](AsyncWebServerRequest *request) {},
@@ -75,10 +104,12 @@ void setup()
       for(int i = 0; i <= len ; i++){
         //Serial.print(dados[i]);
         dadosPet = dadosPet + dados[i];
-        }
+      }
 
-      Serial.print(dadosPet);// depois que guardar na spiffs tem que zerar a variavel
+      Serial.print(dadosPet);
+      // depois que guardar na spiffs tem que zerar a variavel
       dadosPet = "";
+      dados  = {0};
       Serial.println();
       request->send(200);
   });
