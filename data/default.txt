@@ -1,0 +1,21 @@
+{
+    "nome": "",
+    "raca": "",
+    "idade": 5,
+    "peso": 20,
+    "tipoRacao": "",
+    "pesoDispenser": 20.0,
+    "pesoPote": 1.0,
+    "agendas": [
+        {
+            "hora": 8,
+            "minuto": 0,
+            "peso": 1
+        },
+        {
+            "hora": 12,
+            "minuto": 0,
+            "peso": 1
+        }
+    ]
+}
