@@ -31,7 +31,6 @@ String json (String nome, String raca, int idade, double peso, String tipoRacao,
   return texto;
 }
 
-
 String jsonData (int ano, int mes, int dia, int hora, int minuto, int segundo){
   DynamicJsonDocument doc(1024);
   String texto;
@@ -43,8 +42,27 @@ String jsonData (int ano, int mes, int dia, int hora, int minuto, int segundo){
   doc["minuto"]        = minuto;
   doc["segundo"]       = segundo;
 
-
   serializeJson(doc, texto);
-
   return texto;
+}
+
+/*
+Pega a reposta do post e atualiza a hora e data
+*/
+void jsonDataD(String json){ 
+     
+  DynamicJsonDocument doc(1024);
+  deserializeJson(doc, json);
+  
+  int ano     = doc["ano"];
+  int mes     = doc["mes"];
+  int dia     = doc["dia"];
+  int hora    = doc["hora"];
+  int minuto  = doc["minuto"];
+  int segundo = doc["segundo"];
+
+  //Chama a função config time para alterar data e hora.
+  configTime(hora, minuto, segundo, dia, mes, ano);
+
+  
 }
