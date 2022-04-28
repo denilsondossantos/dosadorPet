@@ -21,6 +21,9 @@
 const char *ssid = "dosador_pet";
 const char *password = "dosadorpet";
 //-----------------------------------------------------------------
+//Configurações chip relogio
+ErriezDS1307 rtc;
+#define DATE_STRING_SHORT           3
 
 //---------------- variaveis de teste------------------------------
 
@@ -30,6 +33,9 @@ String dadosPet = "";
 String infoData = "";
 //----------------------------------------------------------------
 AsyncWebServer server(80);
+
+
+
 
 void setup()
 {
@@ -47,9 +53,13 @@ void setup()
   //Seta configurações do chip relógio
   configRelogio();
 
+  readFile(SPIFFS, "/default.txt");  //debug
+  Serial.println("");
+
   //inicia  acess point
   WiFi.softAP(ssid, password);
   IPAddress meuIP = WiFi.softAPIP();
+  Serial.print("IP do equipamento: ");
   Serial.println(meuIP);
 
   //criar rota para servir imagens
@@ -67,9 +77,12 @@ void setup()
   });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(SPIFFS, "text/plain", printaData()); //devolve imagem do pet });
+  printaData();
+  request->send(200, "text/plain", printaData()); //devolve data e hora salvas no equipamento
   });
 
+
+  /*Seta hora e data do equipamento*/
   server.on(
     "/data", HTTP_POST,
     [](AsyncWebServerRequest *request) {},
@@ -84,11 +97,14 @@ void setup()
         }
 
       Serial.print(infoData);
+      jsonDataD(infoData);
+      
       // depois que guardar na spiffs tem que zerar a variavel
+      memset(dados,0,256);
+      infoData = "";
       dadosPet = "";
-      dados = {0};
       Serial.println();
-      request->send(200);
+     request->send(200);
   });
 
   server.on(
@@ -98,18 +114,18 @@ void setup()
     [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
       for (size_t i = 0; i < len; i++)
       {
-        //Serial.write(data[i]);
+        //Serial.write(data[i]);  //debug
         dados[i]= data[i];                         
       }
       for(int i = 0; i <= len ; i++){
-        //Serial.print(dados[i]);
         dadosPet = dadosPet + dados[i];
       }
 
-      Serial.print(dadosPet);
-      // depois que guardar na spiffs tem que zerar a variavel
+      //Serial.print(dadosPet);  //debug 
+      writeFile(SPIFFS, "/default.txt", dados);
+      readFile(SPIFFS, "/default.txt");
       dadosPet = "";
-      dados  = {0};
+      memset(dados,0,256);
       Serial.println();
       request->send(200);
   });
