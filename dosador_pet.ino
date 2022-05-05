@@ -6,7 +6,10 @@
 #include <ErriezDS1307.h>      //ok
 #include <Wire.h>              //nativo
 #include <HX711.h>             //ok
-#include <FS.h>                //ok           
+#include <FS.h>                //ok   
+
+//------------------------ OBJETOS -------------------------- 
+HX711 escala;    
 
 //teste
 //---------------------------------------------------------------
@@ -14,8 +17,10 @@
 #define SDA 23 //define pinos I2C do chip relógio
 #define SCL 19
 
-#define DT_PIN 16 //define pinos I2C da balança
+#define DT_PIN 16 //define pinos I2C da balança do pote
 #define SCK_PIN 17
+
+#define motor 12
 
 //----------------- credenciais wifi ----------------------------
 const char *ssid = "dosador_pet";
@@ -31,6 +36,7 @@ ErriezDS1307 rtc;
 char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
+float pesoPote = 0;
 //----------------------------------------------------------------
 AsyncWebServer server(80);
 
@@ -38,11 +44,22 @@ AsyncWebServer server(80);
 
 
 void setup()
-{
+{ 
 
-  //inicializa serial
+    //inicializa serial
   Serial.begin(19200);
 
+  Serial.println("------------------");
+  Serial.println("PROGRAMA INICIADO");
+  Serial.println("------------------");
+
+  pinMode(motor, OUTPUT);   //define motor como uma saída 
+
+  //inicia balança  
+  escala.begin (DT_PIN, SCK_PIN);
+  configBalancaPote();  //Seta configurações da baçança do pote.
+  Serial.print(getPesoPote());
+   
   // Initialize SPIFFS
   if (!SPIFFS.begin(true))
   {
@@ -52,6 +69,9 @@ void setup()
 
   //Seta configurações do chip relógio
   configRelogio();
+  //configTime(12,10,0,30,4,2022);
+
+ 
 
   readFile(SPIFFS, "/default.txt");  //debug
   Serial.println("");
@@ -67,18 +87,36 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(200, "text/plain", "servidor rodando"); //devolve pagina contendo as informações do gato });
   }); 
+//
+//  server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
+//  request->send(200, "text/plain", json("rex", "pastor alemao", 5, 20.0, "DogShow", 22, 2.3)); //devolve json contendo todas as informações });
+//  });
 
-  server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(200, "text/plain", json("rex", "pastor alemao", 5, 20.0, "DogShow", 22, 2.3)); //devolve json contendo todas as informações });
+  server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/default.txt", "text/plain" );
   });
 
-  server.on("/img", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(SPIFFS, "/pet.jpg", "image/jpeg"); //devolve imagem do pet });
+  server.on("/gato", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/gato.png", "image/png"); //devolve imagem do pet
+  });
+
+  server.on("/image-get", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/cat.png", "image/png"); //devolve imagem do pet
+  });
+
+  server.on("/rain", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/rain.png", "image/png"); //devolve imagem do pet
   });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
   printaData();
   request->send(200, "text/plain", printaData()); //devolve data e hora salvas no equipamento
+  });
+
+  //debug
+  server.on("/peso", HTTP_GET, [](AsyncWebServerRequest *request){
+  String peso = String(getPesoPote(),3);
+  request->send(200, "text/plain", peso); //devolve data e hora salvas no equipamento
   });
 
 
@@ -129,10 +167,31 @@ void setup()
       Serial.println();
       request->send(200);
   });
+
+
+    server.on(
+    "/image-post", HTTP_POST,
+    [](AsyncWebServerRequest *request) {},
+    NULL,
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+      char imagem[300000] = {0};
+      for (size_t i = 0; i < len; i++)
+      {
+        Serial.write(data[i]);  //debug
+        //imagem[i]= data[i];                         
+      }
+
+      //Serial.print(dadosPet);  //debug 
+      //writeFile(SPIFFS, "/cat.png", dados);
+      //readFile(SPIFFS, "/default.txt");
+      //dadosPet = "";
+      memset(imagem,0,300000);
+      Serial.println();
+      request->send(200);
+  });
  server.begin();
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
 }
