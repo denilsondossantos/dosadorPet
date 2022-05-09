@@ -8,10 +8,19 @@
 #include <HX711.h>             //ok
 #include <FS.h>                //ok   
 
+
+typedef struct {
+    //parametros
+    int hora;
+    int minuto;
+    double peso;
+
+}Agenda;
+
 //------------------------ OBJETOS -------------------------- 
 HX711 escala;    
+Agenda agenda[2];
 
-//teste
 //---------------------------------------------------------------
 
 #define SDA 23 //define pinos I2C do chip relógio
@@ -37,7 +46,7 @@ char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
 float pesoPote = 0;
-//----------------------------------------------------------------
+//------------------------------------------------
 AsyncWebServer server(80);
 
 
@@ -46,7 +55,7 @@ AsyncWebServer server(80);
 void setup()
 { 
 
-    //inicializa serial
+  //inicializa serial
   Serial.begin(19200);
 
   Serial.println("------------------");
@@ -56,9 +65,9 @@ void setup()
   pinMode(motor, OUTPUT);   //define motor como uma saída 
 
   //inicia balança  
-  escala.begin (DT_PIN, SCK_PIN);
-  configBalancaPote();  //Seta configurações da baçança do pote.
-  Serial.print(getPesoPote());
+  //escala.begin (DT_PIN, SCK_PIN);
+  //configBalancaPote();  //Seta configurações da baçança do pote.
+  //Serial.print(getPesoPote());
    
   // Initialize SPIFFS
   if (!SPIFFS.begin(true))
@@ -119,6 +128,12 @@ void setup()
   request->send(200, "text/plain", peso); //devolve data e hora salvas no equipamento
   });
 
+//    //testeJson
+//  server.on("/json-teste", HTTP_GET, [](AsyncWebServerRequest *request){
+//  String jsont = readFile(SPIFFS, "/default.txt");
+//  request->send(200, "text/plain", "teste json"); //devolve data e hora salvas no equipamento
+//  });
+
 
   /*Seta hora e data do equipamento*/
   server.on(
@@ -168,30 +183,24 @@ void setup()
       request->send(200);
   });
 
-
-    server.on(
+server.on(
     "/image-post", HTTP_POST,
     [](AsyncWebServerRequest *request) {},
     NULL,
     [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
-      char imagem[300000] = {0};
-      for (size_t i = 0; i < len; i++)
-      {
-        Serial.write(data[i]);  //debug
-        //imagem[i]= data[i];                         
-      }
-
-      //Serial.print(dadosPet);  //debug 
-      //writeFile(SPIFFS, "/cat.png", dados);
-      //readFile(SPIFFS, "/default.txt");
-      //dadosPet = "";
-      memset(imagem,0,300000);
-      Serial.println();
-      request->send(200);
+      if(index==0) writeFileByte(SPIFFS, "/cat.png", (char *)data, len); //Escreve por cima o começo do arquivo
+      else appendFileByte(SPIFFS, "/cat.png", (char *)data, len); //Vai adicionando o resto dos dados no fim do arquivo.
+    
+      if(index+len==total) request->send(200);
   });
+
  server.begin();
 }
 
 void loop()
 {
 }
+
+
+
+
