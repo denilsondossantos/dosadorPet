@@ -66,3 +66,36 @@ void jsonDataD(String json){
 
   
 }
+
+void jsonD(String json){ 
+     
+  DynamicJsonDocument doc(1024);
+  deserializeJson(doc, json);
+  
+  int nome              = doc["nome"];
+  String raca           = doc["raca"];
+  int idade             = doc["idade"];
+  double peso           = doc["peso"];
+  String tipoRacao      = doc["tipoRacao"];
+  double pesoDispenser  = doc["pesoDispenser"];
+  double pesoPote       = doc["pesoPote"];
+  boolean comFome       = doc["comFome"];
+  int tempoComer        = doc["tempoComer"];
+
+  int tamanho = sizeof(doc["agenda"]) / sizeof(int);
+
+  for(int i = 0; i<= tamanho; i ++){
+    agenda[i].hora = doc["agenda"][i]["hora"];
+    agenda[i].minuto = doc["agenda"][i]["minuto"];
+    agenda[i].peso = doc["agenda"][i]["peso"];
+    }
+
+    //debug
+    for(int i = 0; i<= tamanho; i ++){
+    Serial.println(agenda[i].hora);
+    Serial.println(agenda[i].minuto);
+    Serial.println(agenda[i].peso);
+    }
+  
+ 
+}
