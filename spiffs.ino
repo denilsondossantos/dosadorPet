@@ -1,4 +1,11 @@
 
+//-----------------------------------------------------------------
+
+/*
+Funções para utilizar a biblioteca SPIFFS
+*/
+
+//-----------------------------------------------------------------
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\r\n", dirname);
 
@@ -150,13 +157,45 @@ void testFileIO(fs::FS &fs, const char * path){
     }
 }
 
+void appendFileByte(fs::FS &fs, const char * path, const char * message, size_t size){
+    //Serial.printf("Appending to file: %s\r\n", path);
 
-    //listDir(SPIFFS, "/", 0);
-    //writeFile(SPIFFS, "/hello.txt", "Hello ");
-    //appendFile(SPIFFS, "/hello.txt", "World!\r\n");
-    //readFile(SPIFFS, "/hello.txt");
-    //renameFile(SPIFFS, "/hello.txt", "/foo.txt");
-    //readFile(SPIFFS, "/foo.txt");
-    //deleteFile(SPIFFS, "/foo.txt");
-    //testFileIO(SPIFFS, "/test.txt");
-    //deleteFile(SPIFFS, "/test.txt");
+    File file = fs.open(path, FILE_APPEND);
+    if(!file){
+   //     Serial.println("- failed to open file for appending");
+        return;
+    }
+    if(file.write((uint8_t *)message, size)){
+   //     Serial.println("- message appended");
+    } else {
+   //     Serial.println("- append failed");
+    }
+    file.close();
+}
+
+void writeFileByte(fs::FS &fs, const char * path, const char * message, size_t size){
+    //Serial.printf("Writing file: %s\r\n", path);
+
+    File file = fs.open(path, FILE_WRITE);
+    if(!file){
+        //Serial.println("- failed to open file for writing");
+        return;
+    }
+    if(file.write((uint8_t *)message,size)){
+  //      Serial.println("- file written");
+    } else {
+  //      Serial.println("- write failed");
+    }
+    file.close();
+}
+
+
+//    //listDir(SPIFFS, "/", 0);
+//    //writeFile(SPIFFS, "/hello.txt", "Hello ");
+//    //appendFile(SPIFFS, "/hello.txt", "World!\r\n");
+//    //readFile(SPIFFS, "/hello.txt");
+//    //renameFile(SPIFFS, "/hello.txt", "/foo.txt");
+//    //readFile(SPIFFS, "/foo.txt");
+//    //deleteFile(SPIFFS, "/foo.txt");
+//    //testFileIO(SPIFFS, "/test.txt");
+//    //deleteFile(SPIFFS, "/test.txt");
