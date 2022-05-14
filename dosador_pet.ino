@@ -19,7 +19,7 @@ typedef struct {
 
 //------------------------ OBJETOS -------------------------- 
 HX711 escala;    
-Agenda agenda[2];
+Agenda agenda[10];
 
 //---------------------------------------------------------------
 
@@ -46,6 +46,8 @@ char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
 float pesoPote = 0;
+
+int dataAgora[1] = {0};
 //------------------------------------------------
 AsyncWebServer server(80);
 
@@ -63,6 +65,15 @@ void setup()
   Serial.println("------------------");
 
   pinMode(motor, OUTPUT);   //define motor como uma saída 
+
+
+    xTaskCreate(
+                    acionaMotor,          /* Task function. */
+                    "acionaMotor",        /* String with name of task. */
+                    10000,                /* Stack size in bytes. */
+                    NULL,                 /* Parameter passed as input of the task */
+                    1,                   /* Priority of the task. */
+                    NULL);   
 
   //inicia balança  
   //escala.begin (DT_PIN, SCK_PIN);
@@ -128,11 +139,13 @@ void setup()
   request->send(200, "text/plain", peso); //devolve data e hora salvas no equipamento
   });
 
-//    //testeJson
-//  server.on("/json-teste", HTTP_GET, [](AsyncWebServerRequest *request){
-//  String jsont = readFile(SPIFFS, "/default.txt");
-//  request->send(200, "text/plain", "teste json"); //devolve data e hora salvas no equipamento
-//  });
+    //testeJson
+  server.on("/json-teste", HTTP_GET, [](AsyncWebServerRequest *request){
+  String jsonteste = readFileString(SPIFFS, "/default.txt");
+  Serial.println(jsonteste);
+  jsonD(jsonteste);
+  request->send(200, "text/plain", "teste json"); //devolve data e hora salvas no equipamento
+  });
 
 
   /*Seta hora e data do equipamento*/
@@ -200,7 +213,3 @@ server.on(
 void loop()
 {
 }
-
-
-
-
