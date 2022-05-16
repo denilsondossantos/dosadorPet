@@ -13,7 +13,7 @@ hora do equipamento
 */
 
 
-String json (String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, double pesoPote){
+String json (String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, float pesoPote, boolean comFome, int tempoComer){
   DynamicJsonDocument doc(1024);
   String texto;
 
@@ -24,6 +24,9 @@ String json (String nome, String raca, int idade, double peso, String tipoRacao,
   doc["tipoRacao"]       = tipoRacao;
   doc["pesoDispenser"]   = pesoDispenser;
   doc["pesoPote"]        = pesoPote;
+  doc["comFome"]         = comFome;
+  doc["tempoComer"]      = tempoComer;
+  
 
 
   serializeJson(doc, texto);
@@ -72,7 +75,7 @@ void jsonD(String json){
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, json);
   
-  int nome              = doc["nome"];
+  String nome           = doc["nome"];
   String raca           = doc["raca"];
   int idade             = doc["idade"];
   double peso           = doc["peso"];
@@ -82,20 +85,26 @@ void jsonD(String json){
   boolean comFome       = doc["comFome"];
   int tempoComer        = doc["tempoComer"];
 
-  int tamanho = sizeof(doc["agenda"]) / sizeof(int);
 
-  for(int i = 0; i<= tamanho; i ++){
-    agenda[i].hora = doc["agenda"][i]["hora"];
-    agenda[i].minuto = doc["agenda"][i]["minuto"];
-    agenda[i].peso = doc["agenda"][i]["peso"];
+//  tamanho = ((sizeof(doc["agendas"])-1)/3); // sizeof(int);  //gambiarra master
+//  Serial.println("o tamanho é:");     //debug
+//  Serial.print(tamanho);              //debug 
+//  Serial.println("\n");
+
+ tamanhoAgenda = doc["agendas"].size() -1;
+//Serial.println(tamanhoAgenda); //debug 
+
+  Serial.println("Atualizando agenda...");
+  //funcional
+  for(int i = 0; i <= tamanhoAgenda; i ++){
+    agenda[i].hora = doc["agendas"][i]["hora"];
+    //Serial.println(agenda[i].hora);
+    agenda[i].minuto = doc["agendas"][i]["minuto"];
+    //Serial.println(agenda[i].minuto);
+    agenda[i].peso = doc["agendas"][i]["peso"];
+    //Serial.println(agenda[i].peso);
     }
 
-    //debug
-    for(int i = 0; i<= tamanho; i ++){
-    Serial.println(agenda[i].hora);
-    Serial.println(agenda[i].minuto);
-    Serial.println(agenda[i].peso);
-    }
-  
- 
+   Serial.println("Agenda atualizada");
+
 }
