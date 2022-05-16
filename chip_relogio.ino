@@ -13,7 +13,9 @@ void configRelogio()
     while (!Serial) {
         ;
     }
+
     Serial.println(F("\nErriez DS1307 read example"));
+  
 
     // Initialize I2C
     Wire.begin(SDA, SCL);
@@ -24,8 +26,6 @@ void configRelogio()
         Serial.println(F("RTC not found"));
         delay(3000);
     }
-
-
 
     // Set square wave out pin
     // SquareWaveDisable, SquareWave1Hz, SquareWave4096Hz, SquareWave8192Hz, SquareWave32768Hz
@@ -52,44 +52,46 @@ String printaData()
         break;
     }
 
-    // Print day week
-    strncpy_P(name, &(dayNames_P[wday * DATE_STRING_SHORT]), DATE_STRING_SHORT);
-    name[DATE_STRING_SHORT] = '\0';
-    Serial.print(name);
-    Serial.print(F(" "));
-
-    // Print month
-    strncpy_P(name, &(monthNames_P[(mon - 1) * DATE_STRING_SHORT]), DATE_STRING_SHORT);
-    name[DATE_STRING_SHORT] = '\0';
-    Serial.print(name);
-    Serial.print(F(" "));
-
-    // Print day month
-    Serial.print(mday);
-    Serial.print(F(" "));
-
-    // Print time
-    Serial.print(hour);
-    Serial.print(F(":"));
-    if (min < 10) {
-        Serial.print(F("0"));
-    }
-    Serial.print(min);
-    Serial.print(F(":"));
-    if (sec < 10) {
-        Serial.print(F("0"));
-    }
-    Serial.print(sec);
-    Serial.print(F(" "));
-
-    // Print year
-    Serial.println(year);
+//    // Print day week
+//    strncpy_P(name, &(dayNames_P[wday * DATE_STRING_SHORT]), DATE_STRING_SHORT);
+//    name[DATE_STRING_SHORT] = '\0';
+//    Serial.print(name);
+//    Serial.print(F(" "));
+//
+//    // Print month
+//    strncpy_P(name, &(monthNames_P[(mon - 1) * DATE_STRING_SHORT]), DATE_STRING_SHORT);
+//    name[DATE_STRING_SHORT] = '\0';
+//    Serial.print(name);
+//    Serial.print(F(" "));
+//
+//    // Print day month
+//    Serial.print(mday);
+//    Serial.print(F(" "));
+//
+//    // Print time
+//    Serial.print(hour);
+//    Serial.print(F(":"));
+//    if (min < 10) {
+//        Serial.print(F("0"));
+//    }
+//    Serial.print(min);
+//    Serial.print(F(":"));
+//    if (sec < 10) {
+//        Serial.print(F("0"));
+//    }
+//    Serial.print(sec);
+//    Serial.print(F(" "));
+//
+//    // Print year
+//    Serial.println(year);
 
 
 
     
     retornoData = jsonData(year, mon, mday, hour, min, sec);
-    Serial.println(retornoData); //debug 
+    dataAgora[0] = hour;
+    dataAgora[1] = min;
+    //Serial.println(retornoData); //debug 
 
 return retornoData;
 }
