@@ -29,7 +29,7 @@ Agenda agenda[10];
 #define DT_PIN 16 //define pinos I2C da balança do pote
 #define SCK_PIN 17
 
-#define motor 12
+#define motor 13
 
 //----------------- credenciais wifi ----------------------------
 const char *ssid = "dosador_pet";
@@ -39,13 +39,15 @@ const char *password = "dosadorpet";
 ErriezDS1307 rtc;
 #define DATE_STRING_SHORT           3
 
-//---------------- variaveis de teste------------------------------
+//---------------- variaveis de teste / globais ------------------------------
 
 //String dados = "";
 char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
+String infoApp = "";
 float pesoPote = 0;
+int tamanhoAgenda = 0;
 
 int dataAgora[1] = {0};
 //------------------------------------------------
@@ -56,29 +58,18 @@ AsyncWebServer server(80);
 
 void setup()
 { 
+  pinMode(motor, OUTPUT);   //define motor como uma saída 
 
   //inicializa serial
   Serial.begin(19200);
 
-  Serial.println("------------------");
-  Serial.println("PROGRAMA INICIADO");
-  Serial.println("------------------");
-
-  pinMode(motor, OUTPUT);   //define motor como uma saída 
-
-
-    xTaskCreate(
-                    acionaMotor,          /* Task function. */
-                    "acionaMotor",        /* String with name of task. */
-                    10000,                /* Stack size in bytes. */
-                    NULL,                 /* Parameter passed as input of the task */
-                    1,                   /* Priority of the task. */
-                    NULL);   
+  //Seta configurações do chip relógio
+  configRelogio();
+  //configTime(12,10,0,30,4,2022);
 
   //inicia balança  
-  //escala.begin (DT_PIN, SCK_PIN);
-  //configBalancaPote();  //Seta configurações da baçança do pote.
-  //Serial.print(getPesoPote());
+  escala.begin (DT_PIN, SCK_PIN);
+  configBalancaPote();  //Seta configurações da baçança do pote.
    
   // Initialize SPIFFS
   if (!SPIFFS.begin(true))
@@ -86,13 +77,6 @@ void setup()
     Serial.println("Um erro ocorreu durante a montagem da SPIFFS");
     return;
   }
-
-  //Seta configurações do chip relógio
-  configRelogio();
-  //configTime(12,10,0,30,4,2022);
-
- 
-
   readFile(SPIFFS, "/default.txt");  //debug
   Serial.println("");
 
@@ -101,6 +85,18 @@ void setup()
   IPAddress meuIP = WiFi.softAPIP();
   Serial.print("IP do equipamento: ");
   Serial.println(meuIP);
+
+  Serial.println("------------------");
+  Serial.println("PROGRAMA INICIADO");
+  Serial.println("------------------");
+
+    xTaskCreate(
+                    acionaMotor,          /* Task function. */
+                    "acionaMotor",        /* String with name of task. */
+                    10000,                /* Stack size in bytes. */
+                    NULL,                 /* Parameter passed as input of the task */
+                    1,                   /* Priority of the task. */
+                    NULL);   
 
   //criar rota para servir imagens
   // Route for root / web page//pasta raiz quer dizer o ip da página
@@ -112,7 +108,12 @@ void setup()
 //  request->send(200, "text/plain", json("rex", "pastor alemao", 5, 20.0, "DogShow", 22, 2.3)); //devolve json contendo todas as informações });
 //  });
 
+
+  /*Toda vez que o app se conecta ele le e atualiza as informaçãoes da agenda*/
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
+  infoApp = readFileString(SPIFFS, "/default.txt");
+  jsonD(infoApp);  //le e atualiza informações da agenda
+  infoApp = "";
   request->send(SPIFFS, "/default.txt", "text/plain" );
   });
 
@@ -141,9 +142,9 @@ void setup()
 
     //testeJson
   server.on("/json-teste", HTTP_GET, [](AsyncWebServerRequest *request){
-  String jsonteste = readFileString(SPIFFS, "/default.txt");
-  Serial.println(jsonteste);
-  jsonD(jsonteste);
+//  String jsonteste = readFileString(SPIFFS, "/default.txt");
+//  Serial.println(jsonteste);
+//  jsonD(jsonteste);
   request->send(200, "text/plain", "teste json"); //devolve data e hora salvas no equipamento
   });
 
@@ -190,6 +191,10 @@ void setup()
       //Serial.print(dadosPet);  //debug 
       writeFile(SPIFFS, "/default.txt", dados);
       readFile(SPIFFS, "/default.txt");
+
+      infoApp = readFileString(SPIFFS, "/default.txt");
+      jsonD(infoApp);  //le e atualiza informações da agenda
+      infoApp = "";
       dadosPet = "";
       memset(dados,0,256);
       Serial.println();
