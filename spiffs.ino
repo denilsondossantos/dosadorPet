@@ -189,6 +189,27 @@ void writeFileByte(fs::FS &fs, const char * path, const char * message, size_t s
     file.close();
 }
 
+String readFileString(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\r\n", path);
+
+    File file = fs.open(path);
+    while(!file || file.isDirectory()){
+        Serial.println("- failed to open file for reading");
+        break;
+    }
+
+    //Serial.println("- read from file:");
+    int i=0;
+    char resultado[1024] = {0};
+    while(file.available()){
+      resultado[i] = file.read();
+      i++;    
+    }
+     return resultado; 
+
+    file.close();
+}
+
 
 //    //listDir(SPIFFS, "/", 0);
 //    //writeFile(SPIFFS, "/hello.txt", "Hello ");
