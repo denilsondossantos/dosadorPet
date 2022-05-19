@@ -17,9 +17,22 @@ typedef struct {
 
 }Agenda;
 
+typedef struct { 
+  String nome;
+  String raca;
+  int idade;
+  double peso;
+  String tipoRacao;
+  double pesoDispenser;
+  double pesoPote;
+  boolean comFome;
+  int tempoComer;
+  }infoPet;
+
 //------------------------ OBJETOS -------------------------- 
 HX711 escala;    
 Agenda agenda[10];
+infoPet infopet;
 
 //---------------------------------------------------------------
 
@@ -46,10 +59,11 @@ char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
 String infoApp = "";
-float pesoPote = 0;
+//float pesoPote = 0;
 int tamanhoAgenda = 0;
-
 int dataAgora[1] = {0};
+
+
 //------------------------------------------------
 AsyncWebServer server(80);
 
@@ -90,14 +104,18 @@ void setup()
   Serial.println("PROGRAMA INICIADO");
   Serial.println("------------------");
 
+  infoApp = readFileString(SPIFFS, "/default.txt");
+  jsonD(infoApp);  //le e atualiza informações da agenda
+  infoApp = "";
+
     xTaskCreate(
                     acionaMotor,          /* Task function. */
                     "acionaMotor",        /* String with name of task. */
                     10000,                /* Stack size in bytes. */
                     NULL,                 /* Parameter passed as input of the task */
                     1,                   /* Priority of the task. */
-                    NULL);   
-
+                    NULL); 
+                      
   //criar rota para servir imagens
   // Route for root / web page//pasta raiz quer dizer o ip da página
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -125,8 +143,10 @@ void setup()
   request->send(SPIFFS, "/cat.png", "image/png"); //devolve imagem do pet
   });
 
-  server.on("/rain", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(SPIFFS, "/rain.png", "image/png"); //devolve imagem do pet
+  server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
+  //json("cachorro", "pitbull", 5, 100, "dogshow", 100, 100, false, 15);
+  Serial.println(infopet.nome);
+  request->send(200, "text/plain", "pagina de testes");
   });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
