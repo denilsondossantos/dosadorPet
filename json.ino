@@ -14,6 +14,7 @@ hora do equipamento
 
 String json(String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, float pesoPote, boolean comFome, int tempoComer){
   
+  String texto;
   DynamicJsonDocument doc(1024);  //tamanho do documento json
 
   const int CAPACITY = JSON_OBJECT_SIZE(20);
@@ -25,9 +26,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
     docAgenda[i]["minuto"] = agenda[i].minuto;
     docAgenda[i]["peso"] =   agenda[i].peso;
     }
- 
-  String texto;
-
+  
   doc["nome"]            = nome;
   doc["raca"]            = raca;
   doc["idade"]           = idade;
