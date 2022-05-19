@@ -13,7 +13,6 @@ hora do equipamento
 
 
 String json(String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, float pesoPote, boolean comFome, int tempoComer){
-  
   String texto;
   DynamicJsonDocument doc(1024);  //tamanho do documento json
 
@@ -26,7 +25,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
     docAgenda[i]["minuto"] = agenda[i].minuto;
     docAgenda[i]["peso"] =   agenda[i].peso;
     }
-  
+
   doc["nome"]            = nome;
   doc["raca"]            = raca;
   doc["idade"]           = idade;
@@ -84,7 +83,7 @@ void jsonD(String json){
      
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, json);
-  
+
   String nome           = doc["nome"];
   String raca           = doc["raca"];
   int idade             = doc["idade"];
@@ -94,6 +93,17 @@ void jsonD(String json){
   double pesoPote       = doc["pesoPote"];
   boolean comFome       = doc["comFome"];
   int tempoComer        = doc["tempoComer"];
+
+// infopet.nome           = doc["nome"];
+// infopet.raca           = raca;
+// infopet.idade          = idade;
+// infopet.peso           = peso;
+// infopet.tipoRacao      = tipoRacao;
+// infopet.pesoDispenser  = pesoDispenser;
+// infopet.pesoPote       = pesoPote;
+// infopet.comFome        = comFome;
+// infopet.tempoComer     = tempoComer;
+ 
 
 
  tamanhoAgenda = doc["agendas"].size() -1;
