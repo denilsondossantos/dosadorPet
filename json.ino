@@ -1,4 +1,3 @@
-
 //----------------------------
 
 
@@ -13,8 +12,20 @@ hora do equipamento
 */
 
 
-String json (String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, float pesoPote, boolean comFome, int tempoComer){
-  DynamicJsonDocument doc(1024);
+String json(String nome, String raca, int idade, double peso, String tipoRacao, double pesoDispenser, float pesoPote, boolean comFome, int tempoComer){
+  
+  DynamicJsonDocument doc(1024);  //tamanho do documento json
+
+  const int CAPACITY = JSON_OBJECT_SIZE(20);
+  StaticJsonDocument<CAPACITY> docAgenda;
+  JsonArray arr = docAgenda.to<JsonArray>();
+
+    for(int i = 0; i <= tamanhoAgenda; i++){
+    docAgenda[i]["hora"] =   agenda[i].hora;
+    docAgenda[i]["minuto"] = agenda[i].minuto;
+    docAgenda[i]["peso"] =   agenda[i].peso;
+    }
+ 
   String texto;
 
   doc["nome"]            = nome;
@@ -26,13 +37,13 @@ String json (String nome, String raca, int idade, double peso, String tipoRacao,
   doc["pesoPote"]        = pesoPote;
   doc["comFome"]         = comFome;
   doc["tempoComer"]      = tempoComer;
-  
+  doc["agendas"]         = arr;  
 
 
   serializeJson(doc, texto);
-
   return texto;
 }
+
 
 String jsonData (int ano, int mes, int dia, int hora, int minuto, int segundo){
   DynamicJsonDocument doc(1024);
@@ -85,11 +96,6 @@ void jsonD(String json){
   boolean comFome       = doc["comFome"];
   int tempoComer        = doc["tempoComer"];
 
-
-//  tamanho = ((sizeof(doc["agendas"])-1)/3); // sizeof(int);  //gambiarra master
-//  Serial.println("o tamanho é:");     //debug
-//  Serial.print(tamanho);              //debug 
-//  Serial.println("\n");
 
  tamanhoAgenda = doc["agendas"].size() -1;
 //Serial.println(tamanhoAgenda); //debug 
