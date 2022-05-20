@@ -16,7 +16,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   String texto;
   DynamicJsonDocument doc(1024);  //tamanho do documento json
 
-  DynamicJsonDocument docAgenda;
+  DynamicJsonDocument docAgenda(255);
   JsonArray arr = docAgenda.to<JsonArray>();
 
     for(int i = 0; i <= tamanhoAgenda; i++){
