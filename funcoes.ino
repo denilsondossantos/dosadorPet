@@ -13,7 +13,8 @@ void acionaMotor(void * parameter){
       //    Serial.print(dataAgora[1]);
       //    Serial.println("\n");
 
-    for(int i = 0; i <= tamanhoAgenda; i++){
+    //Roda o for até achar o primeiro item "Lixo" da agenda ou até terminar a agenda.
+    for(int i = 0; agenda[i].hora!=-1 && i<AGENDA_INTERNAL_SIZE; i++){
         if(dataAgora[0] == agenda[i].hora && dataAgora[1] == agenda[i].minuto){ 
           Serial.println("ENTREI NA FUNÇÃO DO MOTOR");   
           if(getPesoPote() >= agenda[i].peso/1000.0){

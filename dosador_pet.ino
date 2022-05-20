@@ -31,8 +31,9 @@ typedef struct {
   }infoPet;
 
 //------------------------ OBJETOS -------------------------- 
-HX711 escala;    
-Agenda agenda[10];
+HX711 escala;
+#define AGENDA_INTERNAL_SIZE 10
+Agenda agenda[AGENDA_INTERNAL_SIZE] = {-1};
 infoPet infopet;
 
 //---------------------------------------------------------------
@@ -61,7 +62,7 @@ String dadosPet = "";
 String infoData = "";
 String infoApp = "";
 double pesoPote = 0.0;
-int tamanhoAgenda = 0;
+// int tamanhoAgenda = 0;
 int dataAgora[1] = {0};
 
 
@@ -145,7 +146,7 @@ void setup()
   });
 
   server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
-  Serial.println(tamanhoAgenda);
+  // Serial.println(tamanhoAgenda);
   request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
   });
 
