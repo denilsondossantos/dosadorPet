@@ -16,7 +16,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   String texto;
   DynamicJsonDocument doc(1024);  //tamanho do documento json
 
-  const int CAPACITY = JSON_OBJECT_SIZE(20);
+  const int CAPACITY = JSON_OBJECT_SIZE(12);
   StaticJsonDocument<CAPACITY> docAgenda;
   JsonArray arr = docAgenda.to<JsonArray>();
 
@@ -35,7 +35,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   doc["pesoPote"]        = pesoPote;
   doc["comFome"]         = comFome;
   doc["tempoComer"]      = tempoComer;
-  doc["agendas"]         = arr;  
+  doc["agendas"]         = docAgenda;  
 
 
   serializeJson(doc, texto);
@@ -83,41 +83,41 @@ void jsonD(String json){
      
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, json);
+  
+//  String nome           = ["nome"];
+//  String raca           = doc["raca"];
+//  int idade             = doc["idade"];
+//  double peso           = doc["peso"];
+//  String tipoRacao      = doc["tipoRacao"];
+//  double pesoDispenser  = doc["pesoDispenser"];
+//  double pesoPote       = doc["pesoPote"];
+//  boolean comFome       = doc["comFome"];
+//  int tempoComer        = doc["tempoComer"];
 
-  String nome           = doc["nome"];
-  String raca           = doc["raca"];
-  int idade             = doc["idade"];
-  double peso           = doc["peso"];
-  String tipoRacao      = doc["tipoRacao"];
-  double pesoDispenser  = doc["pesoDispenser"];
-  double pesoPote       = doc["pesoPote"];
-  boolean comFome       = doc["comFome"];
-  int tempoComer        = doc["tempoComer"];
 
-// infopet.nome           = doc["nome"];
-// infopet.raca           = raca;
-// infopet.idade          = idade;
-// infopet.peso           = peso;
-// infopet.tipoRacao      = tipoRacao;
-// infopet.pesoDispenser  = pesoDispenser;
-// infopet.pesoPote       = pesoPote;
-// infopet.comFome        = comFome;
-// infopet.tempoComer     = tempoComer;
- 
-
+ infopet.nome           = doc["nome"].as<String>();
+ infopet.raca           = doc["raca"].as<String>();
+ infopet.idade          = doc["idade"];
+ infopet.peso           = doc["peso"];
+ infopet.tipoRacao      = doc["tipoRacao"].as<String>();
+ infopet.pesoDispenser  = doc["pesoDispenser"];
+ infopet.pesoPote       = doc["pesoPote"];
+ infopet.comFome        = doc["comFome"];
+ infopet.tempoComer     = doc["tempoComer"];
 
  tamanhoAgenda = doc["agendas"].size() -1;
-//Serial.println(tamanhoAgenda); //debug 
-
+ Serial.println("tamanho da agenda dentro de JsonD: ");
+ Serial.print(tamanhoAgenda); //debug 
+ Serial.println(" ");
   Serial.println("Atualizando agenda...");
   //funcional
   for(int i = 0; i <= tamanhoAgenda; i ++){
     agenda[i].hora = doc["agendas"][i]["hora"];
-    //Serial.println(agenda[i].hora);
+    Serial.println(agenda[i].hora);
     agenda[i].minuto = doc["agendas"][i]["minuto"];
-    //Serial.println(agenda[i].minuto);
+    Serial.println(agenda[i].minuto);
     agenda[i].peso = doc["agendas"][i]["peso"];
-    //Serial.println(agenda[i].peso);
+    Serial.println(agenda[i].peso);
     }
 
    Serial.println("Agenda atualizada");
