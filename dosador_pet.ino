@@ -17,16 +17,17 @@ typedef struct {
 
 }Agenda;
 
+
 typedef struct { 
-  String nome;
-  String raca;
-  int idade;
-  double peso;
-  String tipoRacao;
-  double pesoDispenser;
-  double pesoPote;
-  boolean comFome;
-  int tempoComer;
+  String nome = "";
+  String raca = "";
+  int idade = 0;
+  double peso = 0.0;
+  String tipoRacao = "";
+  double pesoDispenser = 0.0;
+  double pesoPote = 0.0;
+  boolean comFome = false;
+  int tempoComer = 0;
   }infoPet;
 
 //------------------------ OBJETOS -------------------------- 
@@ -59,7 +60,7 @@ char dados[256] = {0};
 String dadosPet = "";
 String infoData = "";
 String infoApp = "";
-//float pesoPote = 0;
+double pesoPote = 0.0;
 int tamanhoAgenda = 0;
 int dataAgora[1] = {0};
 
@@ -144,9 +145,8 @@ void setup()
   });
 
   server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
-  //json("cachorro", "pitbull", 5, 100, "dogshow", 100, 100, false, 15);
-  Serial.println(infopet.nome);
-  request->send(200, "text/plain", "pagina de testes");
+  Serial.println(tamanhoAgenda);
+  request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
   });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -160,13 +160,7 @@ void setup()
   request->send(200, "text/plain", peso); //devolve data e hora salvas no equipamento
   });
 
-    //testeJson
-  server.on("/json-teste", HTTP_GET, [](AsyncWebServerRequest *request){
-//  String jsonteste = readFileString(SPIFFS, "/default.txt");
-//  Serial.println(jsonteste);
-//  jsonD(jsonteste);
-  request->send(200, "text/plain", "teste json"); //devolve data e hora salvas no equipamento
-  });
+
 
 
   /*Seta hora e data do equipamento*/
@@ -181,7 +175,7 @@ void setup()
       }
       for(int i = 0; i <= len ; i++){
         infoData = infoData + dados[i];
-        }
+      }
 
       Serial.print(infoData);
       jsonDataD(infoData);
