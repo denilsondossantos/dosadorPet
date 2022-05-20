@@ -10,5 +10,9 @@ float getPesoPote() {
   p = escala.get_units(20);
   //Serial.print("A última leitura do peso lido foi: ");
   //Serial.print(pesoPote);
+  if(p<0){
+    return 0;
+    }
+  else  
   return p;
 }
