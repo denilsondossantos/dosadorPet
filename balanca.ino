@@ -13,6 +13,10 @@ float getPesoPote() {
   if(p<0){
     return 0;
     }
-  else  
-  return p;
+  else{
+    String b = String(p,3);
+    float  c = b.toFloat();
+    return c;    
+    }
+  
 }
