@@ -20,7 +20,23 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   StaticJsonDocument<CAPACITY> docAgenda;
   JsonArray arr = docAgenda.to<JsonArray>();
 
-    for(int i = 0; i <= tamanhoAgenda; i++){
+  Serial.println("tamanho da agenda dentro da serializacao:");
+  Serial.print(tamanhoAgenda);
+
+
+    //condição para dizer que a variavel tamanhoAgenda não pode ser maior que 3.
+    //obs.: alguma coisa esta acontecendo no código pra varivel se alterar
+  if(tamanhoAgenda > 3){
+    tamanhoAgenda = 3;
+  } 
+
+  Serial.println("Printa tamanhoagenda depois da condição:");
+  Serial.print(tamanhoAgenda);
+
+    for(int i = 0; i < tamanhoAgenda; i++){
+    if(agenda[i].hora == 0){
+      break; //se o objeto agenda for igual a 0, sai do for e não faz mais nada.
+    }
     docAgenda[i]["hora"] =   agenda[i].hora;
     docAgenda[i]["minuto"] = agenda[i].minuto;
     docAgenda[i]["peso"] =   agenda[i].peso;
@@ -105,13 +121,19 @@ void jsonD(String json){
  infopet.comFome        = doc["comFome"];
  infopet.tempoComer     = doc["tempoComer"];
 
- tamanhoAgenda = doc["agendas"].size() -1;
+ tamanhoAgenda = doc["agendas"].size();
  Serial.println("tamanho da agenda dentro de JsonD: ");
  Serial.print(tamanhoAgenda); //debug 
  Serial.println(" ");
   Serial.println("Atualizando agenda...");
+
+    //limpa a lista 
+    for(int i = 0; i < tamanhoAgenda; i ++){
+    agenda[i].hora = 0;  // Gambiarra para consertar o bug da Variével global: tamanhoAgenda
+    }
+  
   //funcional
-  for(int i = 0; i <= tamanhoAgenda; i ++){
+  for(int i = 0; i < tamanhoAgenda; i ++){
     agenda[i].hora = doc["agendas"][i]["hora"];
     Serial.println(agenda[i].hora);
     agenda[i].minuto = doc["agendas"][i]["minuto"];
