@@ -122,19 +122,34 @@ void setup()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(200, "text/plain", "servidor rodando"); //devolve pagina contendo as informações do gato });
   }); 
-//
-//  server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
-//  request->send(200, "text/plain", json("rex", "pastor alemao", 5, 20.0, "DogShow", 22, 2.3)); //devolve json contendo todas as informações });
-//  });
 
-
-  /*Toda vez que o app se conecta ele le e atualiza as informaçãoes da agenda*/
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  //Gambiarra para atualizar objeto agenda : e te certeza que os valores da agenda foram atualizados.   
   infoApp = readFileString(SPIFFS, "/default.txt");
   jsonD(infoApp);  //le e atualiza informações da agenda
   infoApp = "";
-  request->send(SPIFFS, "/default.txt", "text/plain" );
+    
+  request->send(200, "text/plain", 
+  json(infopet.nome, 
+  infopet.raca, 
+  infopet.idade, 
+  infopet.peso, 
+  infopet.tipoRacao, 
+  infopet.pesoDispenser, 
+  infopet.pesoPote, 
+  infopet.comFome, 
+  infopet.tempoComer)); //devolve json contendo todas as informações });
   });
+
+
+  /*Toda vez que o app se conecta ele le e atualiza as informaçãoes da agenda*/
+//  server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
+//  infoApp = readFileString(SPIFFS, "/default.txt");
+//  jsonD(infoApp);  //le e atualiza informações da agenda
+//  infoApp = "";
+//  request->send(SPIFFS, "/default.txt", "text/plain" );
+//  });
 
   server.on("/gato", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/gato.png", "image/png"); //devolve imagem do pet
