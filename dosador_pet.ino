@@ -137,7 +137,7 @@ void setup()
   infopet.peso, 
   infopet.tipoRacao, 
   infopet.pesoDispenser, 
-  infopet.pesoPote, 
+  getPesoPote(), 
   infopet.comFome, 
   infopet.tempoComer)); //devolve json contendo todas as informações });
   });
@@ -159,10 +159,10 @@ void setup()
   request->send(SPIFFS, "/cat.png", "image/png"); //devolve imagem do pet
   });
 
-  server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
-  Serial.println(tamanhoAgenda);
-  request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
-  });
+//  server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
+//  Serial.println(tamanhoAgenda);
+//  request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
+//  });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
   printaData();
@@ -171,8 +171,7 @@ void setup()
 
   //debug
   server.on("/peso", HTTP_GET, [](AsyncWebServerRequest *request){
-  String peso = String(getPesoPote(),3);
-  request->send(200, "text/plain", peso); //devolve data e hora salvas no equipamento
+  request->send(200, "text/plain", String(getPesoPote(),3)); //devolve data e hora salvas no equipamento
   });
 
 
