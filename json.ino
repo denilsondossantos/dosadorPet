@@ -32,8 +32,8 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   Serial.println("Printa tamanhoagenda depois da condição:");
   Serial.print(tamanhoAgenda);
 
-    for(int i = 0; i < tamanhoAgenda; i++){
-    if(agenda[i].hora == 0){
+    for(int i = 0; i < AGENDA_INTERNAL_SIZE; i++){
+    if(agenda[i].hora == -1){
       break; //se o objeto agenda for igual a 0, sai do for e não faz mais nada.
     }
     docAgenda[i]["hora"] =   agenda[i].hora;
