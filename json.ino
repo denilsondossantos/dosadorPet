@@ -16,8 +16,7 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   String texto;
   DynamicJsonDocument doc(1024);  //tamanho do documento json
 
-  const int CAPACITY = JSON_OBJECT_SIZE(12);
-  StaticJsonDocument<CAPACITY> docAgenda;
+  DynamicJsonDocument docAgenda(255);
   JsonArray arr = docAgenda.to<JsonArray>();
 
   Serial.println("tamanho da agenda dentro da serializacao:");
@@ -33,8 +32,8 @@ String json(String nome, String raca, int idade, double peso, String tipoRacao, 
   Serial.println("Printa tamanhoagenda depois da condição:");
   Serial.print(tamanhoAgenda);
 
-    for(int i = 0; i < tamanhoAgenda; i++){
-    if(agenda[i].hora == 0){
+    for(int i = 0; i < AGENDA_INTERNAL_SIZE; i++){
+    if(agenda[i].hora == -1){
       break; //se o objeto agenda for igual a 0, sai do for e não faz mais nada.
     }
     docAgenda[i]["hora"] =   agenda[i].hora;
@@ -121,26 +120,29 @@ void jsonD(String json){
  infopet.comFome        = doc["comFome"];
  infopet.tempoComer     = doc["tempoComer"];
 
- tamanhoAgenda = doc["agendas"].size();
+ int tamanhoAgenda = doc["agendas"].size();
+
  Serial.println("tamanho da agenda dentro de JsonD: ");
  Serial.print(tamanhoAgenda); //debug 
  Serial.println(" ");
-  Serial.println("Atualizando agenda...");
-
-    //limpa a lista 
-    for(int i = 0; i < tamanhoAgenda; i ++){
-    agenda[i].hora = 0;  // Gambiarra para consertar o bug da Variével global: tamanhoAgenda
-    }
+ Serial.println("Atualizando agenda...");
   
-  //funcional
-  for(int i = 0; i < tamanhoAgenda; i ++){
+  //Limpa TODA agenda antes de aplicar a nova.
+  for(int i = 0; i < AGENDA_INTERNAL_SIZE; i++){
+    agenda[i].hora = -1;
+    agenda[i].minuto = -1;
+    agenda[i].peso = -1;
+  }
+  //Aplica a nova agenda até onde couber na lista interna.
+  for(int i = 0; i < tamanhoAgenda && i < AGENDA_INTERNAL_SIZE; i++){
+
     agenda[i].hora = doc["agendas"][i]["hora"];
     Serial.println(agenda[i].hora);
     agenda[i].minuto = doc["agendas"][i]["minuto"];
     Serial.println(agenda[i].minuto);
     agenda[i].peso = doc["agendas"][i]["peso"];
     Serial.println(agenda[i].peso);
-    }
+  }
 
    Serial.println("Agenda atualizada");
 
