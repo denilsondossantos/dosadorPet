@@ -32,6 +32,8 @@ typedef struct {
 
 //------------------------ OBJETOS -------------------------- 
 HX711 escala;    
+HX711 escala1; 
+
 Agenda agenda[10];
 infoPet infopet;
 
@@ -42,6 +44,9 @@ infoPet infopet;
 
 #define DT_PIN 16 //define pinos I2C da balança do pote
 #define SCK_PIN 17
+
+#define DT 26 //define pinos I2C da balança maior
+#define SCK 27
 
 #define motor 13
 
@@ -84,7 +89,10 @@ void setup()
 
   //inicia balança  
   escala.begin (DT_PIN, SCK_PIN);
+  escala1.begin (DT, SCK);
+  
   configBalancaPote();  //Seta configurações da baçança do pote.
+  configBalancaMaior();
    
   // Initialize SPIFFS
   if (!SPIFFS.begin(true))
@@ -136,7 +144,7 @@ void setup()
   infopet.idade, 
   infopet.peso, 
   infopet.tipoRacao, 
-  infopet.pesoDispenser, 
+  getPesoMaior(), 
   getPesoPote(), 
   infopet.comFome, 
   infopet.tempoComer)); //devolve json contendo todas as informações });
@@ -159,10 +167,10 @@ void setup()
   request->send(SPIFFS, "/cat.png", "image/png"); //devolve imagem do pet
   });
 
-//  server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
-//  Serial.println(tamanhoAgenda);
-//  request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
-//  });
+  server.on("/teste", HTTP_GET, [](AsyncWebServerRequest *request){
+  Serial.println(tamanhoAgenda);
+  request->send(200, "text/plain", json("cachorro", "pitbull", 5, 100, "dogshow", 100, getPesoPote(), false, 15));
+  });
 
   server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
   printaData();
