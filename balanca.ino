@@ -12,8 +12,8 @@ float getPesoPote() {
       return 0;
     }
   else{
-    Serial.println(String(p,3).toFloat());  
-    return String(p,3).toFloat();   
+   // Serial.println(String(p,3).toFloat());  
+    return String(p,3).toFloat() * 1000;   
   }  
 }
 
@@ -21,17 +21,19 @@ float getPesoPote() {
 void configBalancaMaior() {
   Serial.println(escala1.read());
   escala1.set_scale(22.560);      // Substituir o valor encontrado para escala
-  escala1.tare(10);               // O peso é chamado de Tare.
+  //escala1.tare(10);               // O peso é chamado de Tare.
+  escala1.tare(20);               // O peso é chamado de Tare.
 }
  
 float getPesoMaior() {
  float peso = 0;
- peso = escala1.get_units(20)/1000;
+// char x[9]= {0};
+ 
+ peso = escala1.get_units(20);
   if(peso < 0 ){
       return 0;
     }
   else{
-    Serial.println(String(peso,3).toFloat());  
-    return String(peso,3).toFloat(); 
+   return String(peso,3).toFloat();
   }
 }
