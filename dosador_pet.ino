@@ -68,6 +68,7 @@ String infoApp = "";
 double pesoPote = 0.0;
 int tamanhoAgenda = 0;
 int dataAgora[1] = {0};
+boolean block =  false; //bloqueia requições a rota get enquanto o motor estiver funcionando
 
 
 //------------------------------------------------
@@ -133,11 +134,12 @@ void setup()
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
 
+  if(block == false){
   //Gambiarra para atualizar objeto agenda : e te certeza que os valores da agenda foram atualizados.   
   infoApp = readFileString(SPIFFS, "/default.txt");
   jsonD(infoApp);  //le e atualiza informações da agenda
-  infoApp = "";
-    
+  infoApp = "";  
+
   request->send(200, "text/plain", 
   json(infopet.nome, 
   infopet.raca, 
@@ -148,7 +150,12 @@ void setup()
   getPesoPote(), 
   infopet.comFome, 
   infopet.tempoComer)); //devolve json contendo todas as informações });
-  });
+  }
+  else{
+    request->send(404);
+    }
+
+ });     
 
 
   /*Toda vez que o app se conecta ele le e atualiza as informaçãoes da agenda*/
