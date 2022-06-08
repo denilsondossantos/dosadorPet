@@ -67,8 +67,8 @@ String infoData = "";
 String infoApp = "";
 double pesoPote = 0.0;
 int tamanhoAgenda = 0;
-int dataAgora[1] = {0};
-boolean block =  false; //bloqueia requições a rota get enquanto o motor estiver funcionando
+int dataAgora[2] = {0};
+//boolean block =  false; //bloqueia requições a rota get enquanto o motor estiver funcionando
 
 
 //------------------------------------------------
@@ -118,13 +118,13 @@ void setup()
   jsonD(infoApp);  //le e atualiza informações da agenda
   infoApp = "";
 
-    xTaskCreate(
-                    acionaMotor,          /* Task function. */
-                    "acionaMotor",        /* String with name of task. */
-                    10000,                /* Stack size in bytes. */
-                    NULL,                 /* Parameter passed as input of the task */
-                    1,                   /* Priority of the task. */
-                    NULL); 
+//    xTaskCreate(
+//                    acionaMotor,          /* Task function. */
+//                    "acionaMotor",        /* String with name of task. */
+//                    10000,                /* Stack size in bytes. */
+//                    NULL,                 /* Parameter passed as input of the task */
+//                    1,                   /* Priority of the task. */
+//                    NULL); 
                       
   //criar rota para servir imagens
   // Route for root / web page//pasta raiz quer dizer o ip da página
@@ -134,7 +134,6 @@ void setup()
 
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
 
-  if(block == false){
   //Gambiarra para atualizar objeto agenda : e te certeza que os valores da agenda foram atualizados.   
   infoApp = readFileString(SPIFFS, "/default.txt");
   jsonD(infoApp);  //le e atualiza informações da agenda
@@ -150,10 +149,6 @@ void setup()
   getPesoPote(), 
   infopet.comFome, 
   infopet.tempoComer)); //devolve json contendo todas as informações });
-  }
-  else{
-    request->send(404);
-    }
 
  });     
 
@@ -258,6 +253,26 @@ server.on(
  server.begin();
 }
 
+
 void loop()
 {
+  bool liberaComida = false;
+  int racao = -1;
+  printaData();
+    for(int i = 0; i < 3; i++){
+      if(dataAgora[0] == agenda[i].hora && dataAgora[1] == agenda[i].minuto){
+        liberaComida = true;
+        racao = agenda[i].peso;
+        }        
+      }
+
+    if(getPesoPote() < racao && liberaComida && getPesoMaior() > 20){
+      liberaComida = true;
+      digitalWrite(motor, HIGH);
+      }
+    else{
+      digitalWrite(motor, LOW);
+      racao = -1;
+      liberaComida = false;
+      }    
 }
