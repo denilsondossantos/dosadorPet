@@ -1,6 +1,5 @@
 //---------------------- BIBLIOTECAS ---------------------------
 #include <ArduinoJson.h>       //ok
-#include <WiFi.h>              //nativo
 #include <ESPAsyncWebServer.h> //baixar
 #include <SPIFFS.h>            //ok
 #include <ErriezDS1307.h>      //ok
@@ -8,51 +7,23 @@
 #include <HX711.h>             //ok
 #include <FS.h>                //ok   
 
+#include "main.h"
+#include "wifi.h"
 
 typedef struct {
-    //parametros
     int hora;
     int minuto;
     double peso;
-
 }Agenda;
 
-
-typedef struct { 
-  String nome = "";
-  String raca = "";
-  int idade = 0;
-  double peso = 0.0;
-  String tipoRacao = "";
-  double pesoDispenser = 0.0;
-  double pesoPote = 0.0;
-  boolean comFome = false;
-  int tempoComer = 0;
-  }infoPet;
 
 //------------------------ OBJETOS -------------------------- 
 HX711 escala;    
 HX711 escala1; 
 
 Agenda agenda[10];
-infoPet infopet;
+infoPet infopet = {0};
 
-//---------------------------------------------------------------
-
-#define SDA 23 //define pinos I2C do chip relógio
-#define SCL 19
-
-#define DT_PIN 16 //define pinos I2C da balança do pote
-#define SCK_PIN 17
-
-#define DT 26 //define pinos I2C da balança maior
-#define SCK 27
-
-#define motor 13
-
-//----------------- credenciais wifi ----------------------------
-const char *ssid = "dosador_pet";
-const char *password = "dosadorpet";
 //-----------------------------------------------------------------
 //Configurações chip relogio
 ErriezDS1307 rtc;
@@ -104,11 +75,7 @@ void setup()
   readFile(SPIFFS, "/default.txt");  //debug
   Serial.println("");
 
-  //inicia  acess point
-  WiFi.softAP(ssid, password);
-  IPAddress meuIP = WiFi.softAPIP();
-  Serial.print("IP do equipamento: ");
-  Serial.println(meuIP);
+  initWifi();
 
   Serial.println("------------------");
   Serial.println("PROGRAMA INICIADO");
@@ -118,23 +85,13 @@ void setup()
   jsonD(infoApp);  //le e atualiza informações da agenda
   infoApp = "";
 
-//    xTaskCreate(
-//                    acionaMotor,          /* Task function. */
-//                    "acionaMotor",        /* String with name of task. */
-//                    10000,                /* Stack size in bytes. */
-//                    NULL,                 /* Parameter passed as input of the task */
-//                    1,                   /* Priority of the task. */
-//                    NULL); 
-                      
-  //criar rota para servir imagens
-  // Route for root / web page//pasta raiz quer dizer o ip da página
+
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(200, "text/plain", "servidor rodando"); //devolve pagina contendo as informações do gato });
+  request->send(200, "text/plain", "servidor rodando");
   }); 
 
+  //route for get general informations
   server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
-
-  //Gambiarra para atualizar objeto agenda : e te certeza que os valores da agenda foram atualizados.   
   infoApp = readFileString(SPIFFS, "/default.txt");
   jsonD(infoApp);  //le e atualiza informações da agenda
   infoApp = "";  
@@ -148,18 +105,9 @@ void setup()
   getPesoMaior(), 
   getPesoPote(), 
   infopet.comFome, 
-  infopet.tempoComer)); //devolve json contendo todas as informações });
+  infopet.tempoComer));
 
  });     
-
-
-  /*Toda vez que o app se conecta ele le e atualiza as informaçãoes da agenda*/
-//  server.on("/get", HTTP_GET, [](AsyncWebServerRequest *request){
-//  infoApp = readFileString(SPIFFS, "/default.txt");
-//  jsonD(infoApp);  //le e atualiza informações da agenda
-//  infoApp = "";
-//  request->send(SPIFFS, "/default.txt", "text/plain" );
-//  });
 
   server.on("/gato", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/gato.png", "image/png"); //devolve imagem do pet
@@ -181,13 +129,10 @@ void setup()
 
   //debug
   server.on("/peso", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send(200, "text/plain", String(getPesoPote(),3)); //devolve data e hora salvas no equipamento
+  request->send(200, "text/plain", String(getPesoPote(),3));
   });
 
-
-
-
-  /*Seta hora e data do equipamento*/
+  //route for update hour and data in device
   server.on(
     "/data", HTTP_POST,
     [](AsyncWebServerRequest *request) {},
@@ -219,14 +164,11 @@ void setup()
     [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
       for (size_t i = 0; i < len; i++)
       {
-        //Serial.write(data[i]);  //debug
         dados[i]= data[i];                         
       }
       for(int i = 0; i <= len ; i++){
         dadosPet = dadosPet + dados[i];
       }
-
-      //Serial.print(dadosPet);  //debug 
       writeFile(SPIFFS, "/default.txt", dados);
       readFile(SPIFFS, "/default.txt");
 
@@ -259,20 +201,19 @@ void loop()
   bool liberaComida = false;
   int racao = -1;
   printaData();
-    for(int i = 0; i < 3; i++){
-      if(dataAgora[0] == agenda[i].hora && dataAgora[1] == agenda[i].minuto){
-        liberaComida = true;
-        racao = agenda[i].peso;
-        }        
-      }
-
+  for(int i = 0; i < 3; i++){
+    if(dataAgora[0] == agenda[i].hora && dataAgora[1] == agenda[i].minuto){
+      liberaComida = true;
+      racao = agenda[i].peso;
+      }        
+    }
     if(getPesoPote() < racao && liberaComida && getPesoMaior() > 20){
       liberaComida = true;
       digitalWrite(motor, HIGH);
-      }
+    }
     else{
       digitalWrite(motor, LOW);
       racao = -1;
       liberaComida = false;
-      }    
+    }
 }
