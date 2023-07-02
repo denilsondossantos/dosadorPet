@@ -17,7 +17,6 @@ float getPesoPote() {
   }  
 }
 
-//-------------------------------------------------------------------
 void configBalancaMaior() {
   Serial.println(escala1.read());
   escala1.set_scale(22.560);      // Substituir o valor encontrado para escala
@@ -27,8 +26,6 @@ void configBalancaMaior() {
  
 float getPesoMaior() {
  float peso = 0;
-// char x[9]= {0};
- 
  peso = escala1.get_units(20);
   if(peso < 0 ){
       return 0;

@@ -14,9 +14,6 @@ void configRelogio()
         ;
     }
 
-    Serial.println(F("\nErriez DS1307 read example"));
-  
-
     // Initialize I2C
     Wire.begin(SDA, SCL);
     Wire.setClock(100000);
@@ -34,7 +31,7 @@ void configRelogio()
 
 String printaData()
 {   
-    String retornoData = ""; //variavel de teste 
+    String retornoData = ""; 
 
     char name[DATE_STRING_SHORT + 1];
     uint8_t hour;
@@ -51,42 +48,6 @@ String printaData()
         //return;
         break;
     }
-
-//    // Print day week
-//    strncpy_P(name, &(dayNames_P[wday * DATE_STRING_SHORT]), DATE_STRING_SHORT);
-//    name[DATE_STRING_SHORT] = '\0';
-//    Serial.print(name);
-//    Serial.print(F(" "));
-//
-//    // Print month
-//    strncpy_P(name, &(monthNames_P[(mon - 1) * DATE_STRING_SHORT]), DATE_STRING_SHORT);
-//    name[DATE_STRING_SHORT] = '\0';
-//    Serial.print(name);
-//    Serial.print(F(" "));
-//
-//    // Print day month
-//    Serial.print(mday);
-//    Serial.print(F(" "));
-//
-//    // Print time
-//    Serial.print(hour);
-//    Serial.print(F(":"));
-//    if (min < 10) {
-//        Serial.print(F("0"));
-//    }
-//    Serial.print(min);
-//    Serial.print(F(":"));
-//    if (sec < 10) {
-//        Serial.print(F("0"));
-//    }
-//    Serial.print(sec);
-//    Serial.print(F(" "));
-//
-//    // Print year
-//    Serial.println(year);
-
-
-
     
     retornoData = jsonData(year, mon, mday, hour, min, sec);
     dataAgora[0] = hour;

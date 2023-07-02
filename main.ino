@@ -52,10 +52,7 @@ void setup()
 { 
   pinMode(motor, OUTPUT);   //define motor como uma saída 
 
-  //inicializa serial
   Serial.begin(19200);
-
-  //Seta configurações do chip relógio
   configRelogio();
   //configTime(12,10,0,30,4,2022);
 
